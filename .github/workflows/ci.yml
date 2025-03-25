@@ -60,12 +60,7 @@ jobs:
               platform: macOS 
               build_os: macos-latest-large
               test_os: macos-latest-large
-              brew_deps: >
-                autoconf
-                automake
-                coreutils
-                libtool
-                pkgconfig
+              brew_deps: autoconf automake coreutils libtool pkgconfig
               host: x86_64-apple-darwin
 
             - name: mingw32
@@ -73,8 +68,7 @@ jobs:
               platform: Windows (64-bit MinGW)
               build_os: ubuntu-latest-large
               test_os: windows-latest
-              cross_deps: >
-                mingw-w64
+              cross_deps: mingw-w64
               host: x86_64-w64-mingw32
               file_ext: ".exe"
 
@@ -82,8 +76,7 @@ jobs:
               tier: 3
               platform: ARM64 Linux
               build_os: ubuntu-latest-large
-              cross_deps: >
-                g++-aarch64-linux-gnu
+              cross_deps: g++-aarch64-linux-gnu
               host: aarch64-linux-gnu
 
     outputs:
