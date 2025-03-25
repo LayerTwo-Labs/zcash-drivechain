@@ -60,7 +60,7 @@ jobs:
               platform: macOS 
               build_os: macos-latest-large
               test_os: macos-latest-large
-              brew_deps: autoconf automake coreutils libtool pkgconfig
+              brew_deps: automake coreutils libtool
               host: x86_64-apple-darwin
 
             - name: mingw32
