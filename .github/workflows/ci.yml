@@ -157,7 +157,7 @@ jobs:
           RPC_MATRIX_JSON=$(echo '${{ steps.set-matrices.outputs.rpc_test_matrix }}')
           echo RPC_MATRIX_JSON: $RPC_MATRIX_JSON
 
-          RPC_SHARDS_JSON=$(SRC_DIR=$(pwd) python3 ./subclass.py)
+          RPC_SHARDS_JSON=$(SRC_DIR=$(pwd) python ./subclass.py)
           echo RPC_SHARDS_JSON: $RPC_SHARDS_JSON
 
           echo "$RPC_SHARDS_JSON" | jq -r '[.[] | .shard] | @json "rpc_test_shards=\(.)"' >> $GITHUB_OUTPUT
@@ -515,7 +515,7 @@ jobs:
 
       - name: Run secp256k1 test
         shell: bash
-        run: python3 ./qa/zcash/full_test_suite.py secp256k1
+        run: python ./qa/zcash/full_test_suite.py secp256k1
         env:
           HOST: ${{ matrix.host }}
 
@@ -558,7 +558,7 @@ jobs:
 
       - name: Run univalue test
         shell: bash
-        run: python3 ./qa/zcash/full_test_suite.py univalue
+        run: python ./qa/zcash/full_test_suite.py univalue
         env:
           HOST: ${{ matrix.host }}
 
@@ -592,7 +592,7 @@ jobs:
 
       - name: Run util-test test
         shell: bash
-        run: python3 ./qa/zcash/full_test_suite.py util-test
+        run: python ./qa/zcash/full_test_suite.py util-test
         env:
           HOST: ${{ matrix.host }}
 
@@ -621,7 +621,7 @@ jobs:
 
 
       - name: Run no-dot-so test
-        run: python3 ./qa/zcash/full_test_suite.py no-dot-so
+        run: python ./qa/zcash/full_test_suite.py no-dot-so
         env:
           HOST: ${{ matrix.host }}
 
@@ -662,7 +662,7 @@ jobs:
 
       - name: Run sec-hard test
         shell: bash
-        run: python3 ./qa/zcash/full_test_suite.py sec-hard
+        run: python ./qa/zcash/full_test_suite.py sec-hard
         env:
           HOST: ${{ matrix.host }}
 
@@ -682,6 +682,15 @@ jobs:
         include: ${{ fromJson(needs.setup.outputs.rpc_test_matrix) }}
 
     steps:
+      # We need an old version of Python to run the RPC tests. This is
+      # because we use the `asyncore` library, which was removed in 3.12
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify Python version
+        run: python --version
+
       - name: Cache Python dependencies for RPC tests
         uses: actions/cache@v4
         with:
@@ -693,7 +702,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          python3 -m venv ./venv
+          python -m venv ./venv
           ./venv/Scripts/Activate.ps1
           pip install zmq asyncio base58
 
@@ -701,7 +710,7 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          python3 -m venv ./venv
+          python -m venv ./venv
           . ./venv/bin/activate
           pip install zmq asyncio base58
 
@@ -723,6 +732,15 @@ jobs:
         include: ${{ fromJson(needs.setup.outputs.rpc_test_shards_matrix) }}
 
     steps:
+      # We need an old version of Python to run the RPC tests. This is
+      # because we use the `asyncore` library, which was removed in 3.12
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify Python version
+        run: python --version
+
       - uses: actions/checkout@v4
 
       - name: Cache Python dependencies for RPC tests
@@ -736,7 +754,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          python3 -m venv ./venv
+          python -m venv ./venv
           ./venv/Scripts/Activate.ps1
           pip install zmq asyncio base58
 
@@ -744,7 +762,7 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          python3 -m venv ./venv
+          python -m venv ./venv
           . ./venv/bin/activate
           pip install zmq asyncio base58
 
@@ -814,5 +832,9 @@ jobs:
           if all_passed == False:
               sys.exit(1)
           EOF
+          echo "Python version pre venv activate: $(python --version)"
+          echo "Python location pre venv activate: $(which python)"
           . ./venv/bin/activate
-          ZCASHD=$(pwd)/${{ format('src/zcashd{0}', matrix.file_ext) }} SRC_DIR=$(pwd) python3 ./subclass.py
+          echo "Python version post venv activate: $(python --version)"
+          echo "Python location post venv activate: $(which python)"
+          ZCASHD=$(pwd)/${{ format('src/zcashd{0}', matrix.file_ext) }} SRC_DIR=$(pwd) python ./subclass.py
