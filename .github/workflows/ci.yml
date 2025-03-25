@@ -234,6 +234,7 @@ jobs:
         id: nproc
         shell: bash
         run: echo "count=$(nproc 2> /dev/null || sysctl -n hw.logicalcpu)" >> "$GITHUB_OUTPUT"
+      
 
       - name: Build zcashd
         id: build
@@ -342,6 +343,10 @@ jobs:
         id: nproc
         shell: bash
         run: echo "count=$(nproc 2> /dev/null || sysctl -n hw.logicalcpu)" >> "$GITHUB_OUTPUT"
+      
+      - name: Set CXXFLAGS for macOS to ignore unused argument error
+        if: runner.os == 'macOS'
+        run: echo "CXXFLAGS=-Wno-error=unused-command-line-argument" >> $GITHUB_ENV
 
       - name: Build zcashd with the flag being checked
         env:
