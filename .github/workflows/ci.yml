@@ -162,7 +162,11 @@ jobs:
           print(json.dumps(test_list))
           EOF
           RPC_MATRIX_JSON=$(echo '${{ steps.set-matrices.outputs.rpc_test_matrix }}')
+          echo RPC_MATRIX_JSON: $RPC_MATRIX_JSON
+
           RPC_SHARDS_JSON=$(SRC_DIR=$(pwd) python3 ./subclass.py)
+          echo RPC_SHARDS_JSON: $RPC_SHARDS_JSON
+
           echo "$RPC_SHARDS_JSON" | jq -r '[.[] | .shard] | @json "rpc_test_shards=\(.)"' >> $GITHUB_OUTPUT
           echo -e "$RPC_MATRIX_JSON\n$RPC_SHARDS_JSON" | jq -r -s 'add | @json "rpc_test_shards_matrix=\(.)"' >> $GITHUB_OUTPUT
 
