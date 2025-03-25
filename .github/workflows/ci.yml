@@ -48,53 +48,30 @@ jobs:
       matrix:
         cfg:
           - data:
-            - name: Debian-bookworm
+            - name: ubuntu 
               tier: 1
-              platform: Debian Bookworm
-              build_os: ubuntu-20.04-8cores
-              test_os: ubuntu-20.04
-              container: electriccoinco/debian-helper:bookworm
+              platform: Ubuntu 
+              build_os: ubuntu-latest-large
+              test_os: ubuntu-latest-large
               host: x86_64-pc-linux-gnu
 
-            - name: Debian-bullseye
+            - name: macos
               tier: 1
-              platform: Debian bullseye
-              build_os: ubuntu-20.04-8cores
-              test_os: ubuntu-20.04
-              container: electriccoinco/debian-helper:bullseye
-              host: x86_64-pc-linux-gnu
-
-            - name: ubuntu-20.04
-              tier: 1
-              platform: Ubuntu 20.04
-              build_os: ubuntu-20.04-8cores
-              test_os: ubuntu-20.04
-              host: x86_64-pc-linux-gnu
-
-            - name: ubuntu-22.04
-              tier: 3
-              platform: Ubuntu 22.04
-              build_os: ubuntu-22.04-8cores
-              test_os: ubuntu-22.04
-              host: x86_64-pc-linux-gnu
-
-            # - name: macos-12
-            #   tier: 3
-            #   platform: macOS 12 Monterey
-            #   build_os: macos-12
-            #   test_os: macos-12
-            #   brew_deps: >
-            #     autoconf
-            #     automake
-            #     coreutils
-            #     libtool
-            #     pkgconfig
-            #   host: x86_64-apple-darwin
+              platform: macOS 
+              build_os: macos-latest-large
+              test_os: macos-latest-large
+              brew_deps: >
+                autoconf
+                automake
+                coreutils
+                libtool
+                pkgconfig
+              host: x86_64-apple-darwin
 
             - name: mingw32
-              tier: 3
+              tier: 1
               platform: Windows (64-bit MinGW)
-              build_os: ubuntu-22.04-8cores
+              build_os: ubuntu-latest-large
               test_os: windows-latest
               cross_deps: >
                 mingw-w64
@@ -104,7 +81,7 @@ jobs:
             - name: aarch64-linux
               tier: 3
               platform: ARM64 Linux
-              build_os: ubuntu-22.04-8cores
+              build_os: ubuntu-latest-large
               cross_deps: >
                 g++-aarch64-linux-gnu
               host: aarch64-linux-gnu
