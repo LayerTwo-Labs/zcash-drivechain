@@ -29,7 +29,6 @@
 #include <primitives/block.h>
 #include <serialize.h>
 #include <streams.h>
-#include <util/system.h>
 #include <util/strencodings.h>
 #include <util/system.h>
 #include <univalue.h>
