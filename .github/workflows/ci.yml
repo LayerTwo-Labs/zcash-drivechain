@@ -456,8 +456,33 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download depends-lib artifact (Windows MinGW)
+        if: matrix.name == 'mingw32'
+        uses: actions/download-artifact@v4
+        with:
+          name: depends-lib-${{ matrix.name }}
+          path: ./depends/${{ matrix.host }}/lib
+
+      - name: Set LIBZcash_PATH (Windows MinGW)
+        if: matrix.name == 'mingw32'
+        run: echo "LIBZcash_PATH=$(pwd)/depends/${{ matrix.host }}/lib" >> $GITHUB_ENV
+
+      - name: Configure Rust for MinGW (Windows MinGW)
+        if: matrix.name == 'mingw32'
+        shell: bash
+        run: |
+          rustup target add x86_64-pc-windows-gnu
+          echo "CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER=x86_64-w64-mingw32-gcc" >> $GITHUB_ENV
+
       - name: Run Rust tests
-        run: cargo test
+        shell: bash
+        run: |
+          if [ "${{ matrix.name }}" == "mingw32" ]; then
+            cargo test --target x86_64-pc-windows-gnu
+          else
+            cargo test
+          fi
 
   # Not designed for Windows
   test-secp256k1:
@@ -662,7 +687,17 @@ jobs:
           path: venv
           key: test-rpc-venv-${{ matrix.name }}
 
-      - name: Get Python dependencies for RPC tests
+      - name: Get Python dependencies for RPC tests (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python3 -m venv ./venv
+          ./venv/Scripts/Activate.ps1
+          pip install zmq asyncio base58
+
+      - name: Get Python dependencies for RPC tests (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           python3 -m venv ./venv
           . ./venv/bin/activate
@@ -695,7 +730,17 @@ jobs:
           path: venv
           key: test-rpc-venv-${{ matrix.name }}
 
-      - name: Get Python dependencies for RPC tests if not cached
+      - name: Get Python dependencies for RPC tests if not cached (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python3 -m venv ./venv
+          ./venv/Scripts/Activate.ps1
+          pip install zmq asyncio base58
+
+      - name: Get Python dependencies for RPC tests if not cached (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           python3 -m venv ./venv
           . ./venv/bin/activate
