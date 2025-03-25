@@ -1,15 +1,26 @@
-The master branch will be used to take in upstream updates only, do not push any changes or they will be reverted
---------------
-
-For drivechain changes see the drivechain branch:
-https://github.com/LayerTwo-Labs/zcash-drivechain/tree/drivechain
---------------
-
-
-
-Zcash 6.1.0
+# ZSide - A drivechain based on Zcash 6.1.0
 <img align="right" width="120" height="80" src="doc/imgs/logo.png">
-===========
+
+# Read more about ZSide:
+https://www.truthcoin.info/blog/zside-meltcast/
+
+## Drivechain modifications:
+- Network port number changed to `14567`
+- Message start chars changed to `24e9fdfc`
+
+- Disabled equihash, all blocks use the same solution `DRIVECHAIN_EH_SOLUTION`
+- Disabled upgrades besides sprout
+- Disabled PoW retarget 
+- Allow Min PoW blocks
+- Reset minimum chain work
+- Remove mining subsidy
+- Default data directories changed to:
+```
+// Windows < Vista: C:\Documents and Settings\Username\Application Data\zcash-drivechain
+// Windows >= Vista: C:\Users\Username\AppData\Roaming\zcash-drivechain
+// Mac: ~/Library/Application Support/zcash-drivechain
+// Unix: ~/.zcash-drivechain
+```
 
 What is Zcash?
 --------------

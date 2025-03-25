@@ -100,47 +100,45 @@ public:
         static_assert(equihash_parameters_acceptable(N, K));
         consensus.nEquihashN = N;
         consensus.nEquihashK = K;
-        consensus.powLimit = uint256S("0007ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        // TODO Do we really need to use the regtest powLimit?
+	// consensus.powLimit = uint256S("0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f"); // if this is any larger, the for loop in GetNextWorkRequired can overflow bnTot
+        consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowAveragingWindow = 17;
-        assert(maxUint/UintToArith256(consensus.powLimit) >= consensus.nPowAveragingWindow);
-        consensus.nPowMaxAdjustDown = 32; // 32% adjustment down
-        consensus.nPowMaxAdjustUp = 16; // 16% adjustment up
+        //assert(maxUint/UintToArith256(consensus.powLimit) >= consensus.nPowAveragingWindow);
+        consensus.nPowMaxAdjustDown = 0;
+        consensus.nPowMaxAdjustUp = 0;
+        consensus.nPowAllowMinDifficultyBlocksAfterHeight = 0;
         consensus.nPreBlossomPowTargetSpacing = Consensus::PRE_BLOSSOM_POW_TARGET_SPACING;
         consensus.nPostBlossomPowTargetSpacing = Consensus::POST_BLOSSOM_POW_TARGET_SPACING;
-        consensus.nPowAllowMinDifficultyBlocksAfterHeight = std::nullopt;
-        consensus.fPowNoRetargeting = false;
+        consensus.fPowNoRetargeting = true;
+
         consensus.vUpgrades[Consensus::BASE_SPROUT].nProtocolVersion = 170002;
         consensus.vUpgrades[Consensus::BASE_SPROUT].nActivationHeight =
             Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
         consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nProtocolVersion = 170002;
         consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
             Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
-        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nProtocolVersion = 170005;
-        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight = 347500;
-        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].hashActivationBlock =
-            uint256S("0000000003761c0d0c3974b54bdb425613bbb1eaadd6e70b764de82f195ea243");
-        consensus.vUpgrades[Consensus::UPGRADE_SAPLING].nProtocolVersion = 170007;
-        consensus.vUpgrades[Consensus::UPGRADE_SAPLING].nActivationHeight = 419200;
-        consensus.vUpgrades[Consensus::UPGRADE_SAPLING].hashActivationBlock =
-            uint256S("00000000025a57200d898ac7f21e26bf29028bbe96ec46e05b2c17cc9db9e4f3");
-        consensus.vUpgrades[Consensus::UPGRADE_BLOSSOM].nProtocolVersion = 170009;
-        consensus.vUpgrades[Consensus::UPGRADE_BLOSSOM].nActivationHeight = 653600;
-        consensus.vUpgrades[Consensus::UPGRADE_BLOSSOM].hashActivationBlock =
-            uint256S("00000000020bebb33c1b34b67a982a328ab212a206dacbe561a7cc94aab3e9bb");
-        consensus.vUpgrades[Consensus::UPGRADE_HEARTWOOD].nProtocolVersion = 170011;
-        consensus.vUpgrades[Consensus::UPGRADE_HEARTWOOD].nActivationHeight = 903000;
-        consensus.vUpgrades[Consensus::UPGRADE_HEARTWOOD].hashActivationBlock =
-            uint256S("0000000000aad1c8698964a93c35ecf8b4d05e848de9e2fe7606067139be5643");
-        consensus.vUpgrades[Consensus::UPGRADE_CANOPY].nProtocolVersion = 170013;
-        consensus.vUpgrades[Consensus::UPGRADE_CANOPY].nActivationHeight = 1046400;
-        consensus.vUpgrades[Consensus::UPGRADE_CANOPY].hashActivationBlock =
-            uint256S("00000000002038016f976744c369dce7419fca30e7171dfac703af5e5f7ad1d4");
-        consensus.vUpgrades[Consensus::UPGRADE_NU5].nProtocolVersion = 170100;
-        consensus.vUpgrades[Consensus::UPGRADE_NU5].nActivationHeight = 1687104;
-        consensus.vUpgrades[Consensus::UPGRADE_NU5].hashActivationBlock =
-            uint256S("0000000000d723156d9b65ffcf4984da7a19675ed7e2f06d9e5d5188af087bf8");
-        consensus.vUpgrades[Consensus::UPGRADE_NU6].nProtocolVersion = 170120;
-        consensus.vUpgrades[Consensus::UPGRADE_NU6].nActivationHeight = 2726400;
+        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nProtocolVersion = 170003;
+        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+        consensus.vUpgrades[Consensus::UPGRADE_SAPLING].nProtocolVersion = 170006;
+        consensus.vUpgrades[Consensus::UPGRADE_SAPLING].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+        consensus.vUpgrades[Consensus::UPGRADE_BLOSSOM].nProtocolVersion = 170008;
+        consensus.vUpgrades[Consensus::UPGRADE_BLOSSOM].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+        consensus.vUpgrades[Consensus::UPGRADE_HEARTWOOD].nProtocolVersion = 170010;
+        consensus.vUpgrades[Consensus::UPGRADE_HEARTWOOD].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+        consensus.vUpgrades[Consensus::UPGRADE_CANOPY].nProtocolVersion = 170012;
+        consensus.vUpgrades[Consensus::UPGRADE_CANOPY].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+        consensus.vUpgrades[Consensus::UPGRADE_NU5].nProtocolVersion = 170050;
+        consensus.vUpgrades[Consensus::UPGRADE_NU5].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+        consensus.vUpgrades[Consensus::UPGRADE_NU6].nProtocolVersion = 170110;
+        consensus.vUpgrades[Consensus::UPGRADE_NU6].nActivationHeight =
+            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
         consensus.vUpgrades[Consensus::UPGRADE_ZFUTURE].nProtocolVersion = 0x7FFFFFFF;
         consensus.vUpgrades[Consensus::UPGRADE_ZFUTURE].nActivationHeight =
             Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
@@ -170,115 +168,19 @@ public:
         keyConstants.bech32HRPs[SAPLING_EXTENDED_FVK]         = "zxviews";
 
         keyConstants.bech32mHRPs[TEX_ADDRESS]                 = "tex";
-        {
-            auto canopyActivation = consensus.vUpgrades[Consensus::UPGRADE_CANOPY].nActivationHeight;
-            auto nu6Activation = consensus.vUpgrades[Consensus::UPGRADE_NU6].nActivationHeight;
-
-            // ZIP 214 Revision 0
-            std::vector<std::string> bp_addresses = {
-                "t3LmX1cxWPPPqL4TZHx42HU3U5ghbFjRiif",
-                "t3Toxk1vJQ6UjWQ42tUJz2rV2feUWkpbTDs",
-                "t3ZBdBe4iokmsjdhMuwkxEdqMCFN16YxKe6",
-                "t3ZuaJziLM8xZ32rjDUzVjVtyYdDSz8GLWB",
-                "t3bAtYWa4bi8VrtvqySxnbr5uqcG9czQGTZ",
-                "t3dktADfb5Rmxncpe1HS5BRS5Gcj7MZWYBi",
-                "t3hgskquvKKoCtvxw86yN7q8bzwRxNgUZmc",
-                "t3R1VrLzwcxAZzkX4mX3KGbWpNsgtYtMntj",
-                "t3ff6fhemqPMVujD3AQurxRxTdvS1pPSaa2",
-                "t3cEUQFG3KYnFG6qYhPxSNgGi3HDjUPwC3J",
-                "t3WR9F5U4QvUFqqx9zFmwT6xFqduqRRXnaa",
-                "t3PYc1LWngrdUrJJbHkYPCKvJuvJjcm85Ch",
-                "t3bgkjiUeatWNkhxY3cWyLbTxKksAfk561R",
-                "t3Z5rrR8zahxUpZ8itmCKhMSfxiKjUp5Dk5",
-                "t3PU1j7YW3fJ67jUbkGhSRto8qK2qXCUiW3",
-                "t3S3yaT7EwNLaFZCamfsxxKwamQW2aRGEkh",
-                "t3eutXKJ9tEaPSxZpmowhzKhPfJvmtwTEZK",
-                "t3gbTb7brxLdVVghSPSd3ycGxzHbUpukeDm",
-                "t3UCKW2LrHFqPMQFEbZn6FpjqnhAAbfpMYR",
-                "t3NyHsrnYbqaySoQqEQRyTWkjvM2PLkU7Uu",
-                "t3QEFL6acxuZwiXtW3YvV6njDVGjJ1qeaRo",
-                "t3PdBRr2S1XTDzrV8bnZkXF3SJcrzHWe1wj",
-                "t3ZWyRPpWRo23pKxTLtWsnfEKeq9T4XPxKM",
-                "t3he6QytKCTydhpztykFsSsb9PmBT5JBZLi",
-                "t3VWxWDsLb2TURNEP6tA1ZSeQzUmPKFNxRY",
-                "t3NmWLvZkbciNAipauzsFRMxoZGqmtJksbz",
-                "t3cKr4YxVPvPBG1mCvzaoTTdBNokohsRJ8n",
-                "t3T3smGZn6BoSFXWWXa1RaoQdcyaFjMfuYK",
-                "t3gkDUe9Gm4GGpjMk86TiJZqhztBVMiUSSA",
-                "t3eretuBeBXFHe5jAqeSpUS1cpxVh51fAeb",
-                "t3dN8g9zi2UGJdixGe9txeSxeofLS9t3yFQ",
-                "t3S799pq9sYBFwccRecoTJ3SvQXRHPrHqvx",
-                "t3fhYnv1S5dXwau7GED3c1XErzt4n4vDxmf",
-                "t3cmE3vsBc5xfDJKXXZdpydCPSdZqt6AcNi",
-                "t3h5fPdjJVHaH4HwynYDM5BB3J7uQaoUwKi",
-                "t3Ma35c68BgRX8sdLDJ6WR1PCrKiWHG4Da9",
-                "t3LokMKPL1J8rkJZvVpfuH7dLu6oUWqZKQK",
-                "t3WFFGbEbhJWnASZxVLw2iTJBZfJGGX73mM",
-                "t3L8GLEsUn4QHNaRYcX3EGyXmQ8kjpT1zTa",
-                "t3PgfByBhaBSkH8uq4nYJ9ZBX4NhGCJBVYm",
-                "t3WecsqKDhWXD4JAgBVcnaCC2itzyNZhJrv",
-                "t3ZG9cSfopnsMQupKW5v9sTotjcP5P6RTbn",
-                "t3hC1Ywb5zDwUYYV8LwhvF5rZ6m49jxXSG5",
-                "t3VgMqDL15ZcyQDeqBsBW3W6rzfftrWP2yB",
-                "t3LC94Y6BwLoDtBoK2NuewaEbnko1zvR9rm",
-                "t3cWCUZJR3GtALaTcatrrpNJ3MGbMFVLRwQ",
-                "t3YYF4rPLVxDcF9hHFsXyc5Yq1TFfbojCY6",
-                "t3XHAGxRP2FNfhAjxGjxbrQPYtQQjc3RCQD",
-            };
-
-            // ZF and MG each use a single address repeated 48 times,
-            // once for each funding period.
-            std::vector<std::string> zf_addresses(48, "t3dvVE3SQEi7kqNzwrfNePxZ1d4hUyztBA1");
-            std::vector<std::string> mg_addresses(48, "t3XyYW8yBFRuMnfvm5KLGFbEVz25kckZXym");
-
-            consensus.AddZIP207FundingStream(
-                keyConstants,
-                Consensus::FS_ZIP214_BP,
-                canopyActivation,
-                nu6Activation,
-                bp_addresses);
-            consensus.AddZIP207FundingStream(
-                keyConstants,
-                Consensus::FS_ZIP214_ZF,
-                canopyActivation,
-                nu6Activation,
-                zf_addresses);
-            consensus.AddZIP207FundingStream(
-                keyConstants,
-                Consensus::FS_ZIP214_MG,
-                canopyActivation,
-                nu6Activation,
-                mg_addresses);
-
-            // ZIP 214 Revision 1
-            // FPF uses a single address repeated 12 times, once for each funding period.
-            std::vector<std::string> fpf_addresses(12, "t3cFfPt1Bcvgez9ZbMBFWeZsskxTkPzGCow");
-
-            consensus.AddZIP207FundingStream(
-                keyConstants,
-                Consensus::FS_FPF_ZCG,
-                nu6Activation,
-                3146400,
-                fpf_addresses);
-            consensus.AddZIP207LockboxStream(
-                keyConstants,
-                Consensus::FS_DEFERRED,
-                nu6Activation,
-                3146400);
-        }
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000000011be8336c45e2dd4");
+        consensus.nMinimumChainWork = uint256S("0x00");
 
         /**
          * The message start string should be awesome! ⓩ❤
          */
         pchMessageStart[0] = 0x24;
         pchMessageStart[1] = 0xe9;
-        pchMessageStart[2] = 0x27;
-        pchMessageStart[3] = 0x64;
+        pchMessageStart[2] = 0xfd;
+        pchMessageStart[3] = 0xfc;
         vAlertPubKey = ParseHex("04b7ecf0baa90495ceb4e4090f6b2fd37eec1e9c85fac68a487f3ce11589692e4a317479316ee814e066638e1db54e37a10689b70286e6315b1087b6615d179264");
-        nDefaultPort = 8233;
+        nDefaultPort = 14567;
         nPruneAfterHeight = 100000;
 
         genesis = CreateGenesisBlock(
@@ -292,58 +194,25 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("z.cash", "dnsseed.z.cash")); // Zcash
-        vSeeds.push_back(CDNSSeedData("str4d.xyz", "dnsseed.str4d.xyz")); // @str4d
-        vSeeds.push_back(CDNSSeedData("zfnd.org", "mainnet.seeder.zfnd.org")); // Zcash Foundation
-        vSeeds.push_back(CDNSSeedData("yolo.money", "mainnet.is.yolo.money")); // gtank
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
-        fMiningRequiresPeers = true;
+        fMiningRequiresPeers = false;
         fDefaultConsistencyChecks = false;
-        fRequireStandard = true;
-        fMineBlocksOnDemand = false;
+        fRequireStandard = false;
+        fMineBlocksOnDemand = true;
         fTestnetToBeDeprecatedFieldRPC = false;
 
         checkpointData = (CCheckpointData) {
             boost::assign::map_list_of
-            (      0, consensus.hashGenesisBlock)
-            (   2500, uint256S("0x00000006dc968f600be11a86cbfbf7feb61c7577f45caced2e82b6d261d19744"))
-            (  15000, uint256S("0x00000000b6bc56656812a5b8dcad69d6ad4446dec23b5ec456c18641fb5381ba"))
-            (  67500, uint256S("0x000000006b366d2c1649a6ebb4787ac2b39c422f451880bc922e3a6fbd723616"))
-            ( 100000, uint256S("0x000000001c5c82cd6baccfc0879e3830fd50d5ede17fa2c37a9a253c610eb285"))
-            ( 133337, uint256S("0x0000000002776ccfaf06cc19857accf3e20c01965282f916b8a886e3e4a05be9"))
-            ( 180000, uint256S("0x000000001205b742eac4a1b3959635bdf8aeada078d6a996df89740f7b54351d"))
-            ( 222222, uint256S("0x000000000cafb9e56445a6cabc8057b57ee6fcc709e7adbfa195e5c7fac61343"))
-            ( 270000, uint256S("0x00000000025c1cfa0258e33ab050aaa9338a3d4aaa3eb41defefc887779a9729"))
-            ( 304600, uint256S("0x00000000028324e022a45014c4a4dc51e95d41e6bceb6ad554c5b65d5cea3ea5"))
-            ( 410100, uint256S("0x0000000002c565958f783a24a4ac17cde898ff525e75ed9baf66861b0b9fcada"))
-            ( 497000, uint256S("0x0000000000abd333f0acca6ffdf78a167699686d6a7d25c33fca5f295061ffff"))
-            ( 525000, uint256S("0x0000000001a36c500378be8862d9bf1bea8f1616da6e155971b608139cc7e39b"))
-            ( 650000, uint256S("0x0000000000a0a3fbbd739fb4fcbbfefff44efffc2064ca69a59d5284a2da26e2"))
-            ( 800000, uint256S("0x00000000013f1f4e5634e896ebdbe63dec115547c1480de0d83c64426f913c27"))
-            (1000000, uint256S("0x000000000062eff9ae053020017bfef24e521a2704c5ec9ead2a4608ac70fc7a"))
-            (1200000, uint256S("0x0000000000347d5011108fdcf667c93e622e8635c94e586556898e41db18d192"))
-            (1400000, uint256S("0x0000000001155ecec0ad3924d47ad476c0a5ed7527b8776f53cbda1a780b9f76"))
-            (1600000, uint256S("0x0000000000aae69fb228f90e77f34c24b7920667eaca726c3a3939536f03dcfc"))
-            (1860000, uint256S("0x000000000043a968c78af5fb8133e00e6fe340051c19dd969e53ab62bf3dc22a"))
-            (2000000, uint256S("0x00000000010accaf2f87934765dc2e0bf4823a2b1ae2c1395b334acfce52ad68"))
-            (2200000, uint256S("0x0000000001a0139c4c4d0e8f68cc562227c6003f4b1b640a3d921aeb8c3d2e3d"))
-            (2400000, uint256S("0x0000000000294d1c8d87a1b6566d302aa983691bc3cab0583a245389bbb9d285"))
-            (2600000, uint256S("0x0000000000b5ad92fcec0069d590f674d05ec7d96b1ff727863ea390950c4e49")),
-            1722834204,     // * UNIX timestamp of last checkpoint block
-            14608885,       // * total number of transactions between genesis and last checkpoint
-            6473            // * estimated number of transactions per day after checkpoint
-                            //   (total number of tx * 48 * 24) / checkpoint block height
+            ( 0, consensus.hashGenesisBlock),
+            0,	// * UNIX timestamp of last checkpoint block
+            0,  // * total number of transactions between genesis and last checkpoint
+            0   // * estimated number of transactions per day after checkpoint
+                //   (total number of tx * 48 * 24) / checkpoint block height
         };
 
-        // Hardcoded fallback value for the Sprout shielded value pool balance
-        // for nodes that have not reindexed since the introduction of monitoring
-        // in #2795.
-        nSproutValuePoolCheckpointHeight = 520633;
-        nSproutValuePoolCheckpointBalance = 22145062442933;
         fZIP209Enabled = true;
-        hashSproutValuePoolCheckpointBlock = uint256S("0000000000c7b46b6bc04b4cbf87d8bb08722aebd51232619b214f7273f8460e");
 
         // Founders reward script expects a vector of 2-of-3 multisig addresses
         vFoundersRewardAddress = {};  // Empty array since founders reward is disabled
