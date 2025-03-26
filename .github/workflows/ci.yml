@@ -51,22 +51,22 @@ jobs:
             - name: ubuntu 
               tier: 1
               platform: Ubuntu 
-              build_os: ubuntu-latest-large
-              test_os: ubuntu-latest-large
+              build_os: ubuntu-latest
+              test_os: ubuntu-latest
               host: x86_64-pc-linux-gnu
 
             - name: macos
               tier: 1
               platform: macOS 
-              build_os: macos-latest-large
-              test_os: macos-latest-large
+              build_os: macos-latest
+              test_os: macos-latest
               brew_deps: automake coreutils libtool
               host: x86_64-apple-darwin
 
             - name: mingw32
               tier: 1
               platform: Windows (64-bit MinGW)
-              build_os: ubuntu-latest-large
+              build_os: ubuntu-latest
               test_os: windows-latest
               cross_deps: mingw-w64
               host: x86_64-w64-mingw32
@@ -75,7 +75,7 @@ jobs:
             - name: aarch64-linux
               tier: 3
               platform: ARM64 Linux
-              build_os: ubuntu-latest-large
+              build_os: ubuntu-latest
               cross_deps: g++-aarch64-linux-gnu
               host: aarch64-linux-gnu
 
