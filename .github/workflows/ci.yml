@@ -242,7 +242,9 @@ jobs:
           HOST: ${{ matrix.host }}
         run: >
           ./zcutil/build.sh
-          -j"${{ steps.nproc.outputs.count }}"
+          # Seeing issues with builds seemingly getting stuck. Try dropping
+          # the -j flag to see if that fixes it.
+          # -j"${{ steps.nproc.outputs.count }}"
 
       - name: Upload zcashd and related executables (src)
         uses: actions/upload-artifact@v4
