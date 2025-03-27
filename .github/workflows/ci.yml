@@ -61,7 +61,7 @@ jobs:
               build_os: macos-latest
               test_os: macos-latest
               brew_deps: automake coreutils libtool
-              host: x86_64-apple-darwin
+              host: x86_64-apple-darwin18
 
             - name: mingw32
               tier: 1
