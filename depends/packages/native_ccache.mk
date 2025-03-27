@@ -15,6 +15,11 @@ $(package)_config_opts += -DXXHASH_LIBRARY=$(build_prefix)/lib/libxxhash.a
 $(package)_config_opts += -DZSTD_LIBRARY=$(build_prefix)/lib/libzstd.a
 $(package)_config_opts += -DREDIS_STORAGE_BACKEND=OFF
 $(package)_config_opts += -DENABLE_TESTING=OFF
+ifeq ($(build_os),darwin)
+$(package)_config_opts += -DCMAKE_OSX_ARCHITECTURES=x86_64
+$(package)_config_opts += -DCMAKE_C_FLAGS="-arch x86_64"
+$(package)_config_opts += -DCMAKE_CXX_FLAGS="-arch x86_64"
+endif
 endef
 
 define $(package)_preprocess_cmds
