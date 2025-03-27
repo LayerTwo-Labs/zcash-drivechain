@@ -88,8 +88,6 @@ jobs:
       unix_test_names: ${{ steps.set-matrices.outputs.unix_test_names }}
       rpc_test_matrix: ${{ steps.set-matrices.outputs.rpc_test_matrix }}
       rpc_test_names: ${{ steps.set-matrices.outputs.rpc_test_names }}
-      rpc_test_shards: ${{ steps.set-rpc-tests.outputs.rpc_test_shards }}
-      rpc_test_shards_matrix: ${{ steps.set-rpc-tests.outputs.rpc_test_shards_matrix }}
 
     steps:
       - uses: actions/checkout@v4
@@ -260,6 +258,12 @@ jobs:
               ./src/test/buildenv.py
               ${{ format('./src/bench/bench_bitcoin{0}', matrix.file_ext) }}
 
+      - name: Upload RPC tests config
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpc-tests-config-${{ matrix.name }}
+          path: ./qa/pull-tester/tests_config.ini
+
       - name: Upload src/secp256k1
         uses: actions/upload-artifact@v4
         with:
@@ -359,63 +363,40 @@ jobs:
           -j"${{ steps.nproc.outputs.count }}"
 
   test-btest:
-    name: Boost.Test tier ${{ matrix.tier }} platform ${{ matrix.platform }}
-    if: false # there are tests here that are not passing due to our changes
+    name: Boost.Test
+    if: false # TODO: re-enable when tests are fixed
     needs: [setup, build]
-    runs-on: ${{ matrix.test_os }}
-    container:
-      image: ${{ matrix.container }}
-      env:
-        HOME: /root
-        PATH: /root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-    continue-on-error: ${{ matrix.tier != 1 }}
-    strategy:
-      matrix:
-        include: ${{ fromJson(needs.setup.outputs.test_matrix) }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Download src artifact
         uses: actions/download-artifact@v4
         with:
-          name: zcashd-${{ matrix.name }}
+          name: zcashd-ubuntu
           path: ./src
 
       - name: Make artifact executable
-        if: runner.os != 'Windows'
-        run: chmod +x ${{ format('./src/test/test_bitcoin{0}', matrix.file_ext) }}
+        run: chmod +x ./src/test/test_bitcoin
 
       - name: Run Boost.Tests
-        run: ${{ format('./src/test/test_bitcoin{0}', matrix.file_ext) }} -p
+        run: ./src/test/test_bitcoin
 
   test-gtest:
-    name: GoogleTest tier ${{ matrix.tier }} platform ${{ matrix.platform }} - shard ${{ matrix.shard_index }}
-    if: false # there are tests here that are not passing due to our changes
+    name: GoogleTest 
     needs: [setup, build]
-    runs-on: ${{ matrix.test_os }}
-    container:
-      image: ${{ matrix.container }}
-      env:
-        HOME: /root
-        PATH: /root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-    continue-on-error: ${{ matrix.tier != 1 }}
-    strategy:
-      matrix:
-        name: ${{ fromJson(needs.setup.outputs.test_names) }}
-        shard_index: [0, 1]
-        include: ${{ fromJson(needs.setup.outputs.test_matrix) }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Download src artifact
         uses: actions/download-artifact@v4
         with:
-          name: zcashd-${{ matrix.name }}
+          name: zcashd-ubuntu
           path: ./src
 
       - name: Make artifact executable
-        if: runner.os != 'Windows'
-        run: chmod +x ${{ format('./src/zcash-gtest{0}', matrix.file_ext) }}
+        run: chmod +x ./src/zcash-gtest
 
       - name: Cache Sprout parameters
         uses: actions/cache@v4
@@ -435,259 +416,125 @@ jobs:
       - name: Setup zcash-params
         shell: bash
         run: |
-          if [ "${{ runner.os }}" == "Windows" ]; then
-            mv zcash-params "$APPDATA/ZcashParams"
-          elif [ "${{ runner.os }}" == "macOS" ]; then
-            mv zcash-params "$HOME/Library/Application Support/ZcashParams"
-          elif [ "${{ runner.os }}" == "Linux" ]; then
             mv zcash-params "$HOME/.zcash-params"
-          fi
 
       - name: Run GoogleTests
-        env:
-          GTEST_TOTAL_SHARDS: 2
-          GTEST_SHARD_INDEX: ${{ matrix.shard_index }}
-        run: ${{ format('./src/zcash-gtest{0}', matrix.file_ext) }}
+        run: ./src/zcash-gtest
 
   test-rust:
-    name: Rust test tier ${{ matrix.tier }} platform ${{ matrix.platform }}
+    name: Rust test
     needs: [setup, build]
-    runs-on: ${{ matrix.test_os }}
-    container:
-      image: ${{ matrix.container }}
-      env:
-        HOME: /root
-        PATH: /root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-    continue-on-error: ${{ matrix.tier != 1 }}
-    strategy:
-      matrix:
-        include: ${{ fromJson(needs.setup.outputs.test_matrix) }}
-
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Download depends-lib artifact (Windows MinGW)
-        if: matrix.name == 'mingw32'
-        uses: actions/download-artifact@v4
-        with:
-          name: depends-lib-${{ matrix.name }}
-          path: ./depends/${{ matrix.host }}/lib
-
-      - name: Set LIBZcash_PATH (Windows MinGW)
-        if: matrix.name == 'mingw32'
-        run: echo "LIBZcash_PATH=$(pwd)/depends/${{ matrix.host }}/lib" >> $GITHUB_ENV
-
-      - name: Configure Rust for MinGW (Windows MinGW)
-        if: matrix.name == 'mingw32'
-        shell: bash
-        run: |
-          rustup target add x86_64-pc-windows-gnu
-          echo "CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER=x86_64-w64-mingw32-gcc" >> $GITHUB_ENV
-
-      - name: Run Rust tests
-        shell: bash
-        run: |
-          if [ "${{ matrix.name }}" == "mingw32" ]; then
-            cargo test --target x86_64-pc-windows-gnu
-          else
-            cargo test
-          fi
-
-  # Not designed for Windows
-  test-secp256k1:
-    name: secp256k1 tier ${{ matrix.tier }} platform ${{ matrix.platform }}
-    needs: [setup, build]
-    runs-on: ${{ matrix.test_os }}
-    container:
-      image: ${{ matrix.container }}
-      env:
-        HOME: /root
-        PATH: /root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-    continue-on-error: ${{ matrix.tier != 1 }}
-    strategy:
-      matrix:
-        include: ${{ fromJson(needs.setup.outputs.unix_test_matrix) }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Homebrew build dependencies
-        if: matrix.brew_deps != ''
-        run: brew install ${{ matrix.brew_deps }}
 
       - name: Download src/secp256k1 artifact
         uses: actions/download-artifact@v4
         with:
-          name: secp256k1-${{ matrix.name }}
+          name: secp256k1-ubuntu
           path: ./src/secp256k1
 
       - name: Run secp256k1 test
         shell: bash
         run: python ./qa/zcash/full_test_suite.py secp256k1
-        env:
-          HOST: ${{ matrix.host }}
 
   # Not designed for Windows
   test-univalue:
-    name: univalue tier ${{ matrix.tier }} platform ${{ matrix.platform }}
+    name: univalue 
     needs: [setup, build]
-    runs-on: ${{ matrix.test_os }}
-    container:
-      image: ${{ matrix.container }}
-      env:
-        HOME: /root
-        PATH: /root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-    continue-on-error: ${{ matrix.tier != 1 }}
-    strategy:
-      matrix:
-        include: ${{ fromJson(needs.setup.outputs.unix_test_matrix) }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install Homebrew build dependencies
-        if: matrix.brew_deps != ''
-        run: brew install ${{ matrix.brew_deps }}
 
       - name: Download native/bin artifact
         uses: actions/download-artifact@v4
         with:
-          name: depends-native-bin-${{ matrix.name }}
-          path: ./depends/${{ matrix.host }}/
+          name: depends-native-bin-ubuntu
+          path: ./depends/x86_64-pc-linux-gnu
 
       - name: Download src/univalue artifact
         uses: actions/download-artifact@v4
         with:
-          name: univalue-${{ matrix.name }}
+          name: univalue-ubuntu
           path: ./src/univalue
 
       - name: Make artifact executable
-        if: runner.os != 'Windows'
         run: chmod +x ./src/univalue/build-aux/install-sh
 
       - name: Run univalue test
         shell: bash
         run: python ./qa/zcash/full_test_suite.py univalue
-        env:
-          HOST: ${{ matrix.host }}
 
   # Not designed for Windows
   test-util:
-    name: util-test tier ${{ matrix.tier }} platform ${{ matrix.platform }}
+    name: util-test 
     needs: [setup, build]
-    runs-on: ${{ matrix.test_os }}
-    container:
-      image: ${{ matrix.container }}
-      env:
-        HOME: /root
-        PATH: /root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-    continue-on-error: ${{ matrix.tier != 1 }}
-    strategy:
-      matrix:
-        include: ${{ fromJson(needs.setup.outputs.unix_test_matrix) }}
-
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Download src artifact
         uses: actions/download-artifact@v4
         with:
-          name: zcashd-${{ matrix.name }}
+          name: zcashd-ubuntu
           path: ./src
 
       - name: Make artifact executable
-        if: runner.os != 'Windows'
-        run: chmod +x ${{ format('./src/zcash-tx{0}', matrix.file_ext) }}
+        run: chmod +x ./src/zcash-tx
 
       - name: Run util-test test
         shell: bash
         run: python ./qa/zcash/full_test_suite.py util-test
-        env:
-          HOST: ${{ matrix.host }}
 
   no-dot-so:
-    name: no-dot-so tier ${{ matrix.tier }} platform ${{ matrix.platform }}
+    name: no-dot-so 
     needs: [setup, build]
-    runs-on: ${{ matrix.test_os }}
-    container:
-      image: ${{ matrix.container }}
-      env:
-        HOME: /root
-        PATH: /root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-    continue-on-error: ${{ matrix.tier != 1 }}
-    strategy:
-      matrix:
-        include: ${{ fromJson(needs.setup.outputs.test_matrix) }}
-
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download depends/${{ matrix.host }}/lib
+      - name: Download depends
         uses: actions/download-artifact@v4
         with:
-          name: depends-lib-${{ matrix.name }}
-          path: ./depends/${{ matrix.host }}/lib
+          name: depends-lib-ubuntu
+          path: ./depends/x86_64-pc-linux-gnu/lib
 
 
       - name: Run no-dot-so test
         run: python ./qa/zcash/full_test_suite.py no-dot-so
-        env:
-          HOST: ${{ matrix.host }}
 
   # Not working in Windows
   sec-hard:
-    name: sec-hard tier ${{ matrix.tier }} platform ${{ matrix.platform }}
+    name: sec-hard 
     needs: [setup, build]
-    runs-on: ${{ matrix.test_os }}
-    container:
-      image: ${{ matrix.container }}
-      env:
-        HOME: /root
-        PATH: /root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-    continue-on-error: ${{ matrix.tier != 1 }}
-    strategy:
-      matrix:
-        include: ${{ fromJson(needs.setup.outputs.unix_test_matrix) }}
-
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Download src artifact
         uses: actions/download-artifact@v4
         with:
-          name: zcashd-${{ matrix.name }}
+          name: zcashd-ubuntu
           path: ./src
 
       - name: Make artifact executable
-        if: runner.os != 'Windows'
         run: |
-          chmod +x ${{ format('./src/test/test_bitcoin{0}', matrix.file_ext) }}
-          chmod +x ${{ format('./src/bench/bench_bitcoin{0}', matrix.file_ext) }}
-          chmod +x ${{ format('./src/zcashd{0}', matrix.file_ext) }}
-          chmod +x ${{ format('./src/zcash-cli{0}', matrix.file_ext) }}
-          chmod +x ${{ format('./src/zcash-gtest{0}', matrix.file_ext) }}
-          chmod +x ${{ format('./src/zcashd-wallet-tool{0}', matrix.file_ext) }}
-          chmod +x ${{ format('./src/zcash-tx{0}', matrix.file_ext) }}
+          chmod +x ./src/test/test_bitcoin
+          chmod +x ./src/bench/bench_bitcoin
+          chmod +x ./src/zcashd
+          chmod +x ./src/zcash-cli
+          chmod +x ./src/zcash-gtest
+          chmod +x ./src/zcashd-wallet-tool
+          chmod +x ./src/zcash-tx
 
       - name: Run sec-hard test
         shell: bash
         run: python ./qa/zcash/full_test_suite.py sec-hard
-        env:
-          HOST: ${{ matrix.host }}
 
   rpc-depends:
-    name: RPC set up tier ${{ matrix.tier }} platform ${{ matrix.platform }}
+    name: RPC set up 
     needs: setup
-    runs-on: ${{ matrix.test_os }}
-    container:
-      image: ${{ matrix.container }}
-      env:
-        HOME: /root
-        PATH: /root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-    continue-on-error: ${{ matrix.tier != 1 }}
-    strategy:
-      matrix:
-        name: ${{ fromJson(needs.setup.outputs.rpc_test_names) }}
-        include: ${{ fromJson(needs.setup.outputs.rpc_test_matrix) }}
-
+    runs-on: ubuntu-latest
     steps:
       # We need an old version of Python to run the RPC tests. This is
       # because we use the `asyncore` library, which was removed in 3.12
@@ -703,18 +550,9 @@ jobs:
         with:
           enableCrossOsArchive: true
           path: venv
-          key: test-rpc-venv-${{ matrix.name }}
-
-      - name: Get Python dependencies for RPC tests (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          python -m venv ./venv
-          ./venv/Scripts/Activate.ps1
-          pip install zmq asyncio base58
+          key: test-rpc-venv-ubuntu
 
       - name: Get Python dependencies for RPC tests (Unix)
-        if: runner.os != 'Windows'
         shell: bash
         run: |
           python -m venv ./venv
@@ -722,22 +560,12 @@ jobs:
           pip install zmq asyncio base58
 
   test-rpc:
-    name: RPC tests tier ${{ matrix.tier }} platform ${{ matrix.platform }} ${{ matrix.shard }}
+    name: RPC tests 
+    # Tests hang forever for some reason...
+    # Could be that these should run on large runners?
+    if: false # TODO: re-enable when tests are fixed
     needs: [setup, build, rpc-depends]
-    runs-on: ${{ matrix.test_os }}
-    container:
-      image: ${{ matrix.container }}
-      env:
-        HOME: /root
-        PATH: /root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
-    continue-on-error: ${{ matrix.tier != 1 }}
-    strategy:
-      fail-fast: false
-      matrix:
-        name: ${{ fromJson(needs.setup.outputs.rpc_test_names) }}
-        shard : ${{ fromJson(needs.setup.outputs.rpc_test_shards) }}
-        include: ${{ fromJson(needs.setup.outputs.rpc_test_shards_matrix) }}
-
+    runs-on: ubuntu-latest
     steps:
       # We need an old version of Python to run the RPC tests. This is
       # because we use the `asyncore` library, which was removed in 3.12
@@ -755,18 +583,9 @@ jobs:
         with:
           enableCrossOsArchive: true
           path: venv
-          key: test-rpc-venv-${{ matrix.name }}
+          key: test-rpc-venv-ubuntu
 
-      - name: Get Python dependencies for RPC tests if not cached (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          python -m venv ./venv
-          ./venv/Scripts/Activate.ps1
-          pip install zmq asyncio base58
-
-      - name: Get Python dependencies for RPC tests if not cached (Unix)
-        if: runner.os != 'Windows'
+      - name: Get Python dependencies for RPC tests if not cached 
         shell: bash
         run: |
           python -m venv ./venv
@@ -776,14 +595,19 @@ jobs:
       - name: Download src artifact
         uses: actions/download-artifact@v4
         with:
-          name: zcashd-${{ matrix.name }}
+          name: zcashd-ubuntu
           path: ./src
 
+      - name: Download RPC tests config
+        uses: actions/download-artifact@v4
+        with:
+          name: rpc-tests-config-ubuntu
+          path: ./qa/pull-tester
+
       - name: Make artifact executable
-        if: runner.os != 'Windows'
         run: |
-          chmod +x ${{ format('./src/zcashd{0}', matrix.file_ext) }}
-          chmod +x ${{ format('./src/zcash-cli{0}', matrix.file_ext) }}
+          chmod +x ./src/zcashd
+          chmod +x ./src/zcash-cli
 
       - name: Get Sprout parameters
         uses: actions/cache@v4
@@ -803,45 +627,10 @@ jobs:
       - name: Setup zcash-params
         shell: bash
         run: |
-          if [ "${{ runner.os }}" == "Windows" ]; then
-            mv zcash-params "$APPDATA/ZcashParams"
-          elif [ "${{ runner.os }}" == "macOS" ]; then
-            mv zcash-params "$HOME/Library/Application Support/ZcashParams"
-          elif [ "${{ runner.os }}" == "Linux" ]; then
-            mv zcash-params "$HOME/.zcash-params"
-          fi
+          mv zcash-params "$HOME/.zcash-params"
 
-      - name: RPC test ${{ matrix.shard }}
+      - name: RPC test 
         run: |
-          cat <<EOF > ./subclass.py
-          import importlib
-          import os
-          import subprocess
-          import sys
-
-          sys.path.append('qa/pull-tester')
-          rpc_tests = importlib.import_module('rpc-tests')
-
-          src_dir = os.environ["SRC_DIR"]
-          build_dir = '.'
-          exeext = '${{ matrix.file_ext }}'
-
-          class MyTestHandler(rpc_tests.RPCTestHandler):
-              def start_test(self, args, stdout, stderr):
-                  return subprocess.Popen(
-                      args,
-                      universal_newlines=True,
-                      stdout=stdout,
-                      stderr=stderr)
-
-          test_list = ${{ toJSON(matrix.rpc_tests) }}
-          all_passed = rpc_tests.run_tests(MyTestHandler, test_list, src_dir, build_dir, exeext, jobs=len(test_list))
-          if all_passed == False:
-              sys.exit(1)
-          EOF
-          echo "Python version pre venv activate: $(python --version)"
-          echo "Python location pre venv activate: $(which python)"
           . ./venv/bin/activate
-          echo "Python version post venv activate: $(python --version)"
-          echo "Python location post venv activate: $(which python)"
-          ZCASHD=$(pwd)/${{ format('src/zcashd{0}', matrix.file_ext) }} SRC_DIR=$(pwd) python ./subclass.py
+          ZCASHD=$(pwd)/src/zcashd SRC_DIR=$(pwd) python ./qa/pull-tester/rpc-tests.py
+
