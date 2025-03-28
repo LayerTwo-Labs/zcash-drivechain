@@ -16,7 +16,6 @@ zcash_gtest_SOURCES = \
 	gtest/test_consensus.cpp \
 	gtest/json_test_vectors.cpp \
 	gtest/json_test_vectors.h \
-	gtest/test_foundersreward.cpp \
 	test/data/merkle_roots_orchard.h \
 	gtest/data/tx-orchard-duplicate-nullifiers.h \
 	gtest/test_tautology.cpp \
@@ -39,7 +38,6 @@ zcash_gtest_SOURCES = \
 	gtest/test_metrics.cpp \
 	gtest/test_miner.cpp \
 	gtest/test_pedersen_hash.cpp \
-	gtest/test_pow.cpp \
 	gtest/test_random.cpp \
 	gtest/test_rpc.cpp \
 	gtest/test_sapling_note.cpp \

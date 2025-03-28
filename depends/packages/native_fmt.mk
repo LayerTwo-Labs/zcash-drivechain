@@ -11,6 +11,11 @@ define $(package)_set_vars
 $(package)_config_opts += -DCMAKE_BUILD_TYPE=Release
 $(package)_config_opts += -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE
 $(package)_config_opts += -DFMT_TEST=FALSE
+ifeq ($(build_os),darwin)
+$(package)_config_opts += -DCMAKE_OSX_ARCHITECTURES=x86_64
+$(package)_config_opts += -DCMAKE_C_FLAGS="-arch x86_64"
+$(package)_config_opts += -DCMAKE_CXX_FLAGS="-arch x86_64"
+endif
 endef
 
 define $(package)_preprocess_cmds

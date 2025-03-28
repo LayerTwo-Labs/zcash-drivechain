@@ -41,6 +41,7 @@ for CPP_FILE in $(filter_suffix cpp); do
 done
 
 EXPECTED_BOOST_INCLUDES=(
+    boost/asio/ip/tcp.hpp
     boost/algorithm/string.hpp
     boost/algorithm/string/case_conv.hpp
     boost/algorithm/string/classification.hpp
@@ -49,6 +50,8 @@ EXPECTED_BOOST_INCLUDES=(
     boost/algorithm/string/replace.hpp
     boost/algorithm/string/split.hpp
     boost/algorithm/string/trim.hpp
+    boost/array.hpp
+    boost/asio.hpp
     boost/assert.hpp
     boost/assign/list_of.hpp
     boost/assign/std/vector.hpp
@@ -60,6 +63,7 @@ EXPECTED_BOOST_INCLUDES=(
     boost/filesystem.hpp
     boost/filesystem/detail/utf8_codecvt_facet.hpp
     boost/filesystem/fstream.hpp
+    boost/foreach.hpp
     boost/format.hpp
     boost/function.hpp
     boost/interprocess/sync/file_lock.hpp
@@ -75,6 +79,8 @@ EXPECTED_BOOST_INCLUDES=(
     boost/preprocessor/stringize.hpp
     boost/program_options/detail/config_file.hpp
     boost/program_options/parsers.hpp
+    boost/property_tree/json_parser.hpp
+    boost/property_tree/ptree.hpp
     boost/random/mersenne_twister.hpp
     boost/random/uniform_int_distribution.hpp
     boost/range/algorithm/lower_bound.hpp

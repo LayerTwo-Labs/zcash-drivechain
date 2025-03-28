@@ -20,6 +20,11 @@ $(package)_config_opts += -DZSTD_LZMA_SUPPORT=OFF
 $(package)_config_opts += -DZSTD_MULTITHREAD_SUPPORT=ON
 $(package)_config_opts += -DZSTD_PROGRAMS_LINK_SHARED=OFF
 $(package)_config_opts += -DZSTD_ZLIB_SUPPORT=OFF
+ifeq ($(build_os),darwin)
+$(package)_config_opts += -DCMAKE_OSX_ARCHITECTURES=x86_64
+$(package)_config_opts += -DCMAKE_C_FLAGS="-arch x86_64"
+$(package)_config_opts += -DCMAKE_CXX_FLAGS="-arch x86_64"
+endif
 endef
 
 define $(package)_config_cmds
