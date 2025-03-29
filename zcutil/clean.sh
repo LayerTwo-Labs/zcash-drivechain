@@ -27,7 +27,7 @@ rm -f qa/pull-tester/tests-config.sh
 
 rm -f src/fuzz.cpp
 
-rm -rf test_bitcoin.coverage/ zcash-gtest.coverage/ total.coverage/
+rm -rf test_bitcoin.coverage/ zside-gtest.coverage/ total.coverage/
 
 rm -rf cache
 rm -rf target
@@ -80,12 +80,12 @@ clean_dirs .libs
 clean_dirs __pycache__
 
 clean_exe src/bench/bench_bitcoin
-clean_exe src/zcash-cli
-clean_exe src/zcashd
-clean_exe src/zcashd-wallet-tool
-clean_exe src/zcash-gtest
-clean_exe src/zcash-inspect
-clean_exe src/zcash-tx
+clean_exe src/zside-cli
+clean_exe src/zsided
+clean_exe src/zsided-wallet-tool
+clean_exe src/zside-gtest
+clean_exe src/zside-inspect
+clean_exe src/zside-tx
 clean_exe src/test/test_bitcoin
 
 clean_exe src/leveldb/db_bench

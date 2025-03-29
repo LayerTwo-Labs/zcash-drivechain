@@ -1,6 +1,6 @@
 [package]
 name = "librustzcash"
-description = "Rust FFI used by the zcashd binary. Not an official API."
+description = "Rust FFI used by the zsided binary. Not an official API."
 version = "0.2.0"
 authors = [
     "Sean Bowe <sean@electriccoin.co>",
@@ -30,7 +30,7 @@ path = "src/rust/src/lib.rs"
 crate-type = ["staticlib"]
 
 [[bin]]
-name = "zcashd-wallet-tool"
+name = "zsided-wallet-tool"
 path = "src/rust/bin/wallet_tool.rs"
 
 [dependencies]

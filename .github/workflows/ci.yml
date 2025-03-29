@@ -234,7 +234,7 @@ jobs:
         run: echo "count=$(nproc 2> /dev/null || sysctl -n hw.logicalcpu)" >> "$GITHUB_OUTPUT"
       
 
-      - name: Build zcashd
+      - name: Build zsided
         id: build
         env:
           HOST: ${{ matrix.host }}
@@ -244,17 +244,17 @@ jobs:
           # the -j flag to see if that fixes it.
           # -j"${{ steps.nproc.outputs.count }}"
 
-      - name: Upload zcashd and related executables (src)
+      - name: Upload zsided and related executables (src)
         uses: actions/upload-artifact@v4
         with:
-          name: zcashd-${{ matrix.name }}
+          name: zsided-${{ matrix.name }}
           path: |
-              ${{ format('./src/zcashd{0}', matrix.file_ext) }}
-              ${{ format('./src/zcash-cli{0}', matrix.file_ext) }}
-              ${{ format('./src/zcashd-wallet-tool{0}', matrix.file_ext) }}
-              ${{ format('./src/zcash-tx{0}', matrix.file_ext) }}
+              ${{ format('./src/zsided{0}', matrix.file_ext) }}
+              ${{ format('./src/zside-cli{0}', matrix.file_ext) }}
+              ${{ format('./src/zsided-wallet-tool{0}', matrix.file_ext) }}
+              ${{ format('./src/zside-tx{0}', matrix.file_ext) }}
               ${{ format('./src/test/test_bitcoin{0}', matrix.file_ext) }}
-              ${{ format('./src/zcash-gtest{0}', matrix.file_ext) }}
+              ${{ format('./src/zside-gtest{0}', matrix.file_ext) }}
               ./src/test/buildenv.py
               ${{ format('./src/bench/bench_bitcoin{0}', matrix.file_ext) }}
 
@@ -299,7 +299,7 @@ jobs:
       - name: Download src artifact
         uses: actions/download-artifact@v4
         with:
-          name: zcashd-ubuntu
+          name: zsided-ubuntu
           path: ./src
 
       - name: Make artifact executable
@@ -318,11 +318,11 @@ jobs:
       - name: Download src artifact
         uses: actions/download-artifact@v4
         with:
-          name: zcashd-ubuntu
+          name: zsided-ubuntu
           path: ./src
 
       - name: Make artifact executable
-        run: chmod +x ./src/zcash-gtest
+        run: chmod +x ./src/zside-gtest
 
       - name: Cache Sprout parameters
         uses: actions/cache@v4
@@ -345,7 +345,7 @@ jobs:
             mv zcash-params "$HOME/.zcash-params"
 
       - name: Run GoogleTests
-        run: ./src/zcash-gtest
+        run: ./src/zside-gtest
 
   test-rust:
     name: Rust test
@@ -402,11 +402,11 @@ jobs:
       - name: Download src artifact
         uses: actions/download-artifact@v4
         with:
-          name: zcashd-ubuntu
+          name: zsided-ubuntu
           path: ./src
 
       - name: Make artifact executable
-        run: chmod +x ./src/zcash-tx
+        run: chmod +x ./src/zside-tx
 
       - name: Run util-test test
         shell: bash
@@ -440,18 +440,18 @@ jobs:
       - name: Download src artifact
         uses: actions/download-artifact@v4
         with:
-          name: zcashd-ubuntu
+          name: zsided-ubuntu
           path: ./src
 
       - name: Make artifact executable
         run: |
           chmod +x ./src/test/test_bitcoin
           chmod +x ./src/bench/bench_bitcoin
-          chmod +x ./src/zcashd
-          chmod +x ./src/zcash-cli
-          chmod +x ./src/zcash-gtest
-          chmod +x ./src/zcashd-wallet-tool
-          chmod +x ./src/zcash-tx
+          chmod +x ./src/zsided
+          chmod +x ./src/zside-cli
+          chmod +x ./src/zside-gtest
+          chmod +x ./src/zsided-wallet-tool
+          chmod +x ./src/zside-tx
 
       - name: Run sec-hard test
         shell: bash
@@ -521,7 +521,7 @@ jobs:
       - name: Download src artifact
         uses: actions/download-artifact@v4
         with:
-          name: zcashd-ubuntu
+          name: zsided-ubuntu
           path: ./src
 
       - name: Download RPC tests config
@@ -532,8 +532,8 @@ jobs:
 
       - name: Make artifact executable
         run: |
-          chmod +x ./src/zcashd
-          chmod +x ./src/zcash-cli
+          chmod +x ./src/zsided
+          chmod +x ./src/zside-cli
 
       - name: Get Sprout parameters
         uses: actions/cache@v4
@@ -558,5 +558,5 @@ jobs:
       - name: RPC test 
         run: |
           . ./venv/bin/activate
-          ZCASHD=$(pwd)/src/zcashd SRC_DIR=$(pwd) python ./qa/pull-tester/rpc-tests.py
+          ZCASHD=$(pwd)/src/zsided SRC_DIR=$(pwd) python ./qa/pull-tester/rpc-tests.py
 
