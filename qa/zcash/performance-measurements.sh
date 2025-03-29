@@ -9,7 +9,7 @@ SHA256CMD="$(command -v sha256sum || echo shasum)"
 SHA256ARGS="$(command -v sha256sum >/dev/null || echo '-a 256')"
 
 function zcash_rpc {
-    ./src/zcash-cli -datadir="$DATADIR" -rpcuser=user -rpcpassword=password -rpcport=5983 "$@"
+    ./src/zside-cli -datadir="$DATADIR" -rpcuser=user -rpcpassword=password -rpcport=5983 "$@"
 }
 
 function zcash_rpc_slow {
@@ -76,7 +76,7 @@ function zcashd_start {
             mkdir -p "$DATADIR/regtest"
             touch "$DATADIR/zcash.conf"
     esac
-    ./src/zcashd -regtest -datadir="$DATADIR" -rpcuser=user -rpcpassword=password -rpcport=5983 -showmetrics=0 &
+    ./src/zsided -regtest -datadir="$DATADIR" -rpcuser=user -rpcpassword=password -rpcport=5983 -showmetrics=0 &
     ZCASHD_PID=$!
     zcash_rpc_wait_for_start
 }
@@ -109,7 +109,7 @@ function zcashd_heaptrack_start {
             mkdir -p "$DATADIR/regtest"
             touch "$DATADIR/zcash.conf"
     esac
-    heaptrack -o "${TEST_NAME}" ./src/zcashd -regtest -datadir="$DATADIR" -rpcuser=user -rpcpassword=password -rpcport=5983 -showmetrics=0 &
+    heaptrack -o "${TEST_NAME}" ./src/zsided -regtest -datadir="$DATADIR" -rpcuser=user -rpcpassword=password -rpcport=5983 -showmetrics=0 &
     ZCASHD_PID=$!
     zcash_rpc_wait_for_start
 }
@@ -124,7 +124,7 @@ function zcashd_valgrind_start {
     mkdir -p "$DATADIR/regtest"
     touch "$DATADIR/zcash.conf"
     rm -f valgrind.out
-    valgrind --leak-check=yes -v --error-limit=no --log-file="valgrind.out" ./src/zcashd -regtest -datadir="$DATADIR" -rpcuser=user -rpcpassword=password -rpcport=5983 -showmetrics=0 &
+    valgrind --leak-check=yes -v --error-limit=no --log-file="valgrind.out" ./src/zsided -regtest -datadir="$DATADIR" -rpcuser=user -rpcpassword=password -rpcport=5983 -showmetrics=0 &
     ZCASHD_PID=$!
     zcash_rpc_wait_for_start
 }
@@ -391,7 +391,7 @@ case "$1" in
         case "$2" in
             gtest)
                 rm -f valgrind.out
-                valgrind --leak-check=yes -v --error-limit=no --log-file="valgrind.out" ./src/zcash-gtest
+                valgrind --leak-check=yes -v --error-limit=no --log-file="valgrind.out" ./src/zside-gtest
                 cat valgrind.out
                 rm -f valgrind.out
                 ;;

@@ -2,13 +2,13 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or https://www.opensource.org/licenses/mit-license.php .
 
-TESTS += zcash-gtest
-noinst_PROGRAMS += zcash-gtest
+TESTS += zside-gtest
+noinst_PROGRAMS += zside-gtest
 
 # tool for generating our public parameters.
 # test_checktransaction.cpp MUST be before
 # any test that calls SelectParams().
-zcash_gtest_SOURCES = \
+zside_gtest_SOURCES = \
 	gtest/main.cpp \
 	gtest/utils.cpp \
 	gtest/utils.h \
@@ -54,7 +54,7 @@ zcash_gtest_SOURCES = \
 	gtest/test_zip32.cpp \
 	gtest/test_coins.cpp
 if ENABLE_WALLET
-zcash_gtest_SOURCES += \
+zside_gtest_SOURCES += \
 	wallet/gtest/test_wallet_zkeys.cpp \
 	wallet/gtest/test_orchard_zkeys.cpp \
 	wallet/gtest/test_note_selection.cpp \
@@ -64,10 +64,10 @@ zcash_gtest_SOURCES += \
 	wallet/gtest/test_rpc_wallet.cpp
 endif
 
-zcash_gtest_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-zcash_gtest_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+zside_gtest_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+zside_gtest_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
-zcash_gtest_LDADD = \
+zside_gtest_LDADD = \
   -lgtest -lgmock \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_CLI) \
@@ -86,7 +86,7 @@ zcash_gtest_LDADD = \
   $(LIBMEMENV) \
   $(LIBSECP256K1)
 
-zcash_gtest_LDADD += \
+zside_gtest_LDADD += \
   $(LIBZCASH_SCRIPT) \
   $(BOOST_LIBS) \
   $(BOOST_UNIT_TEST_FRAMEWORK_LIB) \
@@ -98,10 +98,10 @@ zcash_gtest_LDADD += \
   $(LIBZCASH) \
   $(LIBZCASH_LIBS)
 
-zcash_gtest_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) -static
+zside_gtest_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) -static
 
-zcash-gtest_check: zcash-gtest FORCE
-	./zcash-gtest
+zside-gtest_check: zside-gtest FORCE
+	./zside-gtest
 
-zcash-gtest-expected-failures: zcash-gtest FORCE
-	./zcash-gtest --gtest_filter=*DISABLED_* --gtest_also_run_disabled_tests
+zside-gtest-expected-failures: zside-gtest FORCE
+	./zside-gtest --gtest_filter=*DISABLED_* --gtest_also_run_disabled_tests
