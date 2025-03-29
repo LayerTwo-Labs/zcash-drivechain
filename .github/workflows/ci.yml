@@ -560,3 +560,43 @@ jobs:
           . ./venv/bin/activate
           ZCASHD=$(pwd)/src/zsided SRC_DIR=$(pwd) python ./qa/pull-tester/rpc-tests.py
 
+
+  upload-artifacts-to-releases-drivechain-info:
+    name: Upload artifacts to releases.drivechain.info
+    runs-on: ubuntu-latest
+    needs: [build]
+    # avoid uploading on PRs!
+    if: github.event_name == 'push' && github.ref == 'refs/heads/drivechain' && github.repository_owner == 'LayerTwo-Labs'
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: zsided-*
+
+      - name: Zip artifacts
+        run: |
+          mkdir binaries-Linux
+          mv ./zsided-ubuntu/{zsided,zside-cli} binaries-Linux/
+          mv binaries-Linux L2-S5-ZSide-latest-x86_64-unknown-linux-gnu
+          zip -r L2-S5-ZSide-latest-x86_64-unknown-linux-gnu.zip L2-S5-ZSide-latest-x86_64-unknown-linux-gnu
+
+          mkdir binaries-macOS
+          mv ./zsided-macos/{zsided,zside-cli} binaries-macOS/
+          mv binaries-macOS L2-S5-ZSide-latest-x86_64-apple-darwin
+          zip -r L2-S5-ZSide-latest-x86_64-apple-darwin.zip L2-S5-ZSide-latest-x86_64-apple-darwin
+
+          mkdir binaries-Windows
+          mv ./zsided-mingw32/{zsided.exe,zside-cli.exe} binaries-Windows/
+          mv binaries-Windows L2-S5-ZSide-latest-x86_64-pc-windows-gnu
+          zip -r L2-S5-ZSide-latest-x86_64-pc-windows-gnu.zip L2-S5-ZSide-latest-x86_64-pc-windows-gnu
+
+
+      - name: Upload artifacts to releases.drivechain.info
+        uses: cross-the-world/ssh-scp-ssh-pipelines@latest
+        with:
+          host: 45.33.96.47
+          user: root
+          pass: ${{ secrets.RELEASES_SERVER_PW }}
+          port: 22
+          scp: |
+            'L2-S5-*.zip' => '/var/www/html/'
