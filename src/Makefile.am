@@ -629,7 +629,7 @@ nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
 # bitcoind binary #
 zsided_SOURCES = bitcoind.cpp
 zsided_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-zsided_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+zsided_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS) -Wno-deprecated-redundant-constexpr-static-def
 zsided_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
@@ -654,13 +654,28 @@ zsided_LDADD = \
   $(LIBMEMENV) \
   $(LIBSECP256K1)
 
+
+# nutty long list of absl libraries. possible to do this in a more elegant way?
+
 zsided_LDADD += \
   $(BOOST_LIBS) \
   $(BDB_LIBS) \
   $(EVENT_PTHREADS_LIBS) \
   $(EVENT_LIBS) \
   $(ZMQ_LIBS) \
-  $(LIBZCASH_LIBS)
+  $(LIBZCASH_LIBS) \
+  -lprotobuf -labsl_log_internal_message -labsl_log_internal_check_op \
+  -labsl_log_internal_conditions -labsl_log_internal_format \
+  -labsl_log_internal_globals -labsl_log_internal_proto \
+  -labsl_log_internal_nullguard -labsl_log_internal_log_sink_set \
+  -labsl_log_severity -labsl_log_sink -labsl_log_globals -labsl_log_initialize \
+  -labsl_raw_logging_internal -labsl_strings \
+  -labsl_strings_internal -labsl_base -labsl_spinlock_wait \
+  -labsl_time -labsl_time_zone -labsl_civil_time -labsl_str_format_internal \
+  -labsl_synchronization -labsl_graphcycles_internal -labsl_malloc_internal \
+  -labsl_debugging_internal -labsl_demangle_internal -labsl_stacktrace \
+  -labsl_symbolize -labsl_examine_stack -labsl_hash -labsl_city -labsl_low_level_hash \
+  -labsl_throw_delegate -labsl_int128
 
 # bitcoin-cli binary #
 zside_cli_SOURCES = bitcoin-cli.cpp
@@ -798,10 +813,6 @@ if HARDEN
 	$(AM_V_at) READELF=$(READELF) OBJDUMP=$(OBJDUMP) $(top_srcdir)/contrib/devtools/security-check.py $(bin_PROGRAMS)
 	$(AM_V_at) READELF=$(READELF) OBJDUMP=$(OBJDUMP) $(top_srcdir)/contrib/devtools/security-check.py --allow-no-canary $(bin_SCRIPTS)
 endif
-
-%.pb.cc %.pb.h: %.proto
-	@test -f $(PROTOC)
-	$(AM_V_GEN) $(PROTOC) --cpp_out=$(@D) --proto_path=$(abspath $(<D) $<)
 
 if EMBEDDED_LEVELDB
 include Makefile.crc32c.include

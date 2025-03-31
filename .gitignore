@@ -62,8 +62,6 @@ src/univalue/gen
 .zcash
 *.a
 *.lib
-*.pb.cc
-*.pb.h
 .vscode
 
 *.log

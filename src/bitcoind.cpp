@@ -5,6 +5,7 @@
 // file COPYING or https://www.opensource.org/licenses/mit-license.php .
 
 #include "clientversion.h"
+#include "protobuf/cusf/sidechain/v1/sidechain.pb.h"
 #include "deprecation.h"
 #include "fs.h"
 #include "rpc/server.h"
@@ -215,6 +216,7 @@ bool AppInit(int argc, char* argv[])
 #else
 int main(int argc, char* argv[])
 {
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
     SetupEnvironment();
 
     // Connect bitcoind signal handlers
