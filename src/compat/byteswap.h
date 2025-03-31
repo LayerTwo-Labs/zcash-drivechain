@@ -15,6 +15,13 @@
 #include <byteswap.h>
 #endif
 
+// On macOS, don't define our own bswap functions as they conflict with the system ones
+#if defined(__APPLE__)
+#include <libkern/OSByteOrder.h>
+#define bswap_16(x) OSSwapInt16(x)
+#define bswap_32(x) OSSwapInt32(x)
+#define bswap_64(x) OSSwapInt64(x)
+#else
 #if HAVE_DECL_BSWAP_16 == 0
 inline uint16_t bswap_16(uint16_t x)
 {
@@ -43,5 +50,6 @@ inline uint64_t bswap_64(uint64_t x)
           | ((x & 0x00000000000000ffull) << 56));
 }
 #endif // HAVE_DECL_BSWAP64
+#endif // defined(__APPLE__)
 
 #endif // BITCOIN_COMPAT_BYTESWAP_H
